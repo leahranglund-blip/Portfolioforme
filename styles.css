@@ -1,0 +1,541 @@
+:root {
+    --marineblaa: #6c0000;
+    --marineblaa-lys: #ddecff;
+    --hvit: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--marineblaa);
+    color: var(--hvit);
+    font-family: Arial, sans-serif;
+    transition: background-color 500ms ease, color 500ms ease;
+}
+
+body.spotify-playing {
+    --marineblaa: #FFCD6C;
+    --marineblaa-lys: #FFBB33;
+    --hvit: #D8631F;
+    --music-control-background: #D14032;
+    --music-control-foreground: #ffffff;
+}
+
+body.spotify-playing--angeline {
+    --marineblaa: #FFF8CA;
+    --marineblaa-lys: #6B0B0C;
+    --hvit: #2D120D;
+    --music-control-background: #CDE3E8;
+    --music-control-foreground: #2D120D;
+}
+
+body.spotify-playing--reverse-psychology {
+    --marineblaa: #d00502;
+    --marineblaa-lys: #95e1ff;
+    --hvit: #fff1d6;
+    --music-control-background: #37a3cc;
+    --music-control-foreground: #142c3a;
+}
+
+.home-body {
+    background: var(--marineblaa);
+}
+
+.home-header {
+    position: absolute;
+    z-index: 3;
+    inset: 0 0 auto;
+    background: rgb(0 0 0 / 28%);
+    backdrop-filter: blur(8px);
+}
+
+.home-main {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.home-hero {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1890 / 1417;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #263746;
+    isolation: isolate;
+}
+
+.home-hero-image {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+}
+
+.home-mask-definitions {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.home-glass-image {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    object-position: center;
+    opacity: 0.62;
+    mix-blend-mode: soft-light;
+    mask: url(#glass-reveal-mask);
+    -webkit-mask: url(#glass-reveal-mask);
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-position: 0 0;
+    -webkit-mask-position: 0 0;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-origin: border-box;
+    mask-clip: border-box;
+    pointer-events: none;
+}
+
+.about-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 8cm);
+    align-items: start;
+    gap: 2rem;
+}
+
+.about-music {
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+    width: min(8cm, 100%);
+}
+
+.record-player {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.record-cover {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    object-fit: cover;
+    animation: vinyl-spin 8s linear infinite;
+    pointer-events: none;
+}
+
+.spotify-player {
+    width: 100%;
+    max-width: 8cm;
+}
+
+.spotify-player iframe {
+    display: block;
+    width: 100%;
+    height: 88px;
+    border: 0;
+    border-radius: 10px;
+}
+
+.spotify-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+}
+
+.spotify-control {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 65%);
+    border-radius: 50%;
+    background: var(--music-control-background, var(--marineblaa-lys));
+    color: var(--music-control-foreground, var(--marineblaa));
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 500ms ease, color 500ms ease, transform 150ms ease;
+}
+
+.spotify-control:hover:not(:disabled) {
+    transform: scale(1.08);
+}
+
+.spotify-control:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+@keyframes vinyl-spin {
+    to { transform: rotate(360deg); }
+}
+
+.home-next-section {
+    min-height: 100vh;
+    padding: 0;
+    background: var(--marineblaa);
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.25rem 2rem;
+    background: var(--marineblaa-lys);
+    transition: background-color 500ms ease, color 500ms ease;
+}
+
+.logo {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.logo a {
+    color: var(--hvit);
+    text-decoration: none;
+}
+
+nav ul {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+nav a {
+    color: var(--hvit);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover,
+nav a:focus-visible {
+    text-decoration: underline;
+}
+
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+}
+
+section {
+    min-height: 45vh;
+    padding: 3rem 0;
+}
+
+.gallery-page {
+    max-width: none;
+}
+
+.gallery-body header {
+    position: fixed;
+    z-index: 5;
+    top: 0;
+    right: 0;
+    left: 0;
+}
+
+.gallery-body main {
+    max-width: none;
+    height: 100vh;
+    padding: 0;
+}
+
+.gallery-body section {
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+}
+
+.gallery-window {
+    height: 100%;
+    margin-top: 0;
+    overflow: auto;
+    background: #04152d;
+    cursor: grab;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.gallery-window::-webkit-scrollbar {
+    display: none;
+}
+
+.gallery-window:active {
+    cursor: grabbing;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(180px, 24vw));
+    gap: 0;
+    width: max-content;
+    padding: 0;
+}
+
+.gallery-grid img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--marineblaa-lys);
+    transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.gallery-grid img:hover {
+    z-index: 1;
+    transform: scale(1.04);
+}
+
+.image-lightbox {
+    position: fixed;
+    z-index: 10;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: rgb(0 0 0 / 88%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+}
+
+.image-lightbox.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.image-lightbox img {
+    display: block;
+    max-width: min(90vw, 1400px);
+    max-height: 90vh;
+    object-fit: contain;
+    border: 2px solid var(--hvit);
+    cursor: pointer;
+}
+
+h1 {
+    font-size: clamp(2.5rem, 7vw, 5rem);
+}
+
+h2 {
+    font-size: 2.5rem;
+}
+
+.project-item {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: 2rem;
+    margin-top: 3rem;
+    padding: 2rem 0;
+    border-top: 1px solid rgb(255 255 255 / 25%);
+}
+
+.project-description {
+    min-height: 220px;
+    padding: 1.5rem;
+    border-left: 4px solid var(--marineblaa-lys);
+    background: rgb(255 255 255 / 8%);
+}
+
+.project-description h2 {
+    margin-top: 0;
+    font-size: 2rem;
+}
+
+.flipbook {
+    width: 100%;
+    max-width: 520px;
+    justify-self: center;
+}
+
+.flipbook-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.magazine-spread {
+    display: flex;
+    width: min(100%, 620px);
+    margin: 0 auto;
+    background: var(--hvit);
+    box-shadow: 0 1rem 3rem rgb(0 0 0 / 35%);
+    transform-origin: center;
+}
+
+.magazine-spread.is-single-page {
+    justify-content: center;
+    width: auto;
+}
+
+.spread-page {
+    flex: 1 1 50%;
+    min-width: 0;
+    background: var(--hvit);
+}
+
+.spread-page[hidden] {
+    display: none !important;
+}
+
+.magazine-spread.is-cover .spread-page {
+    cursor: pointer;
+}
+
+.spread-page + .spread-page {
+    border-left: 1px solid rgb(0 0 0 / 16%);
+}
+
+.spread-page canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.magazine-spread.turn-next {
+    animation: turn-next 350ms ease;
+}
+
+.magazine-spread.turn-previous {
+    animation: turn-previous 350ms ease;
+}
+
+.magazine-button {
+    flex: 0 0 2.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--hvit);
+    border-radius: 50%;
+    background: var(--marineblaa-lys);
+    color: var(--hvit);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.magazine-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+}
+
+.page-counter {
+    flex: 1;
+    margin: 0;
+    text-align: center;
+}
+
+@keyframes turn-next {
+    0% { transform: perspective(900px) rotateY(8deg); opacity: 0.5; }
+    100% { transform: perspective(900px) rotateY(0); opacity: 1; }
+}
+
+@keyframes turn-previous {
+    0% { transform: perspective(900px) rotateY(-8deg); opacity: 0.5; }
+    100% { transform: perspective(900px) rotateY(0); opacity: 1; }
+}
+
+@media (max-width: 700px) {
+    .home-header {
+        gap: 1rem;
+    }
+
+    .home-mist {
+        backdrop-filter: blur(6px) saturate(0.78) brightness(1.05);
+        -webkit-backdrop-filter: blur(6px) saturate(0.78) brightness(1.05);
+        mask-image: radial-gradient(circle 48px at var(--pointer-x) var(--pointer-y), transparent 0 10px, #000 48px);
+        -webkit-mask-image: radial-gradient(circle 48px at var(--pointer-x) var(--pointer-y), transparent 0 10px, #000 48px);
+    }
+
+    header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        gap: 0.75rem 1rem;
+    }
+
+    main {
+        padding: 3rem 1rem;
+    }
+
+    .gallery-window {
+        height: 65vh;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(9, 72vw);
+    }
+
+    .project-item {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-top: 2rem;
+        padding: 1.5rem 0;
+    }
+
+    .magazine-spread {
+        width: 100%;
+    }
+
+    .project-description {
+        min-height: 0;
+        padding: 1rem;
+    }
+
+    .project-description h2 {
+        font-size: 1.7rem;
+    }
+
+    .magazine-button {
+        flex-basis: 2.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .about-section {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .about-music {
+        justify-self: end;
+    }
+}

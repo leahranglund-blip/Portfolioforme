@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Min portefølje</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="home-body">
+    <header class="home-header">
+        <p class="logo">Leah Ranglund</p>
+
+        <nav aria-label="Hovedmeny">
+            <ul>
+                <li><a href="CV/Leah_Ranglund_CV26.pdf" target="_blank" rel="noopener noreferrer">CV</a></li>
+                <li><a href="Galleri.html">Galleri</a></li>
+                <li><a href="Om-meg.html">Om meg</a></li>
+                <li><a href="Sertifiseringer.html">Sertifiseringer</a></li>
+                <li><a href="Prosjekter.html">Prosjekter</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="home-main">
+        <section class="home-hero" aria-label="Highlands-landskap">
+            <img class="home-hero-image" src="Bilder/highlands.png" alt="Landskap fra Highlands" draggable="false">
+            <svg class="home-mask-definitions" aria-hidden="true">
+                <defs>
+                    <filter id="reveal-softness">
+                        <feGaussianBlur stdDeviation="4"></feGaussianBlur>
+                    </filter>
+                    <mask id="glass-reveal-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                        <rect class="mask-background" x="0" y="0" fill="white"></rect>
+                        <circle class="clear-point" cx="-1000" cy="-1000" r="50" fill="black" opacity="0" filter="url(#reveal-softness)"></circle>
+                    </mask>
+                </defs>
+            </svg>
+            <img class="home-glass-image" src="Bilder/Texturelabs_Glass_154S.jpg" alt="" aria-hidden="true" draggable="false">
+        </section>
+        <section class="home-next-section" aria-label="Neste del av porteføljen"></section>
+    </main>
+
+    <script>
+        const hero = document.querySelector(".home-hero");
+        const heroImage = document.querySelector(".home-hero-image");
+        const maskSvg = document.querySelector(".home-mask-definitions");
+        const mask = document.querySelector("#glass-reveal-mask");
+        const maskBackground = document.querySelector(".mask-background");
+        const clearPoint = document.querySelector(".clear-point");
+        let targetX = -1000;
+        let targetY = -1000;
+        let pointerX = -1000;
+        let pointerY = -1000;
+        let animationFrame;
+        let hideTimer;
+        let isRevealing = false;
+
+        function resizeMask() {
+            const bounds = hero.getBoundingClientRect();
+            maskSvg.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
+            mask.setAttribute("x", "0");
+            mask.setAttribute("y", "0");
+            mask.setAttribute("width", bounds.width);
+            mask.setAttribute("height", bounds.height);
+            maskBackground.setAttribute("x", "0");
+            maskBackground.setAttribute("y", "0");
+            maskBackground.setAttribute("width", bounds.width);
+            maskBackground.setAttribute("height", bounds.height);
+        }
+
+        function animateReveal() {
+            pointerX += (targetX - pointerX) * 0.14;
+            pointerY += (targetY - pointerY) * 0.14;
+            clearPoint.setAttribute("cx", pointerX);
+            clearPoint.setAttribute("cy", pointerY);
+
+            if (Math.abs(targetX - pointerX) > 0.6 || Math.abs(targetY - pointerY) > 0.6) {
+                animationFrame = requestAnimationFrame(animateReveal);
+            } else {
+                pointerX = targetX;
+                pointerY = targetY;
+            }
+        }
+
+        function startReveal(event) {
+            const bounds = hero.getBoundingClientRect();
+            targetX = event.clientX - bounds.left;
+            targetY = event.clientY - bounds.top;
+            if (!isRevealing) {
+                pointerX = targetX;
+                pointerY = targetY;
+                isRevealing = true;
+            }
+
+            clearPoint.setAttribute("opacity", "1");
+            clearTimeout(hideTimer);
+            cancelAnimationFrame(animationFrame);
+            animationFrame = requestAnimationFrame(animateReveal);
+        }
+
+        resizeMask();
+        window.addEventListener("resize", resizeMask);
+        new ResizeObserver(resizeMask).observe(hero);
+        heroImage.addEventListener("load", resizeMask);
+        hero.addEventListener("pointermove", startReveal);
+        hero.addEventListener("pointerleave", () => {
+            hideTimer = setTimeout(() => {
+                cancelAnimationFrame(animationFrame);
+                isRevealing = false;
+                targetX = -1000;
+                targetY = -1000;
+                pointerX = -1000;
+                pointerY = -1000;
+                clearPoint.setAttribute("cx", "-1000");
+                clearPoint.setAttribute("cy", "-1000");
+                clearPoint.setAttribute("opacity", "0");
+            }, 900);
+        });
+    </script>
+</body>
+</html>

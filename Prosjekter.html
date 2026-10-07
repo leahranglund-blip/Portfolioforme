@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prosjekter - Min portefølje</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <p class="logo"><a href="index.html">Hovedside</a></p>
+        <nav aria-label="Hovedmeny">
+            <ul>
+                <li><a href="CV/Leah_Ranglund_CV26.pdf" target="_blank" rel="noopener noreferrer">CV</a></li>
+                <li><a href="Galleri.html">Galleri</a></li>
+                <li><a href="Om-meg.html">Om meg</a></li>
+                <li><a href="Sertifiseringer.html">Sertifiseringer</a></li>
+                <li><a href="Prosjekter.html">Prosjekter</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h1>Prosjekter</h1>
+            <p>Utforsk prosjektene mine.</p>
+
+            <article class="project-item">
+                <div class="project-description">
+                    <h2>Reisemagasinet</h2>
+                    <p>Reisemagasinet ble produsert via Adobe InDesign i Publiseringsemne på Høyskolen Kristiania.</p>
+                </div>
+                <div class="flipbook" data-pdf="Prosjekter/Reisemagasinet%20publisering.pdf" aria-label="Reisemagasinet, A4-format">
+                    <div class="flipbook-controls">
+                        <button class="magazine-button previous-page" type="button" aria-label="Forrige side">&#8592;</button>
+                        <p class="page-counter">Laster magasinet ...</p>
+                        <button class="magazine-button next-page" type="button" aria-label="Neste side">&#8594;</button>
+                    </div>
+                    <div class="magazine-spread">
+                        <div class="spread-page"><canvas></canvas></div>
+                        <div class="spread-page"><canvas></canvas></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="project-item">
+                <div class="project-description">
+                    <h2>Avisoppslag</h2>
+                    <p>Avisoppslaget ble produsert via Adobe InDesign i Publiseringsemne på Høyskolen Kristiania.</p>
+                </div>
+                <div class="flipbook" data-pdf="Prosjekter/Avisoppslag%20publisering.pdf" aria-label="Avisoppslag, 280 x 400 millimeter">
+                    <div class="flipbook-controls">
+                        <button class="magazine-button previous-page" type="button" aria-label="Forrige side">&#8592;</button>
+                        <p class="page-counter">Laster oppslaget ...</p>
+                        <button class="magazine-button next-page" type="button" aria-label="Neste side">&#8594;</button>
+                    </div>
+                    <div class="magazine-spread">
+                        <div class="spread-page"><canvas></canvas></div>
+                        <div class="spread-page"><canvas></canvas></div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script type="module">
+        import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+
+        document.querySelectorAll(".flipbook").forEach(async (flipbook) => {
+            const pdfPath = flipbook.dataset.pdf;
+            const spread = flipbook.querySelector(".magazine-spread");
+            const pageFrames = [...flipbook.querySelectorAll(".spread-page")];
+            const canvases = [...flipbook.querySelectorAll("canvas")];
+            const counter = flipbook.querySelector(".page-counter");
+            const previousButton = flipbook.querySelector(".previous-page");
+            const nextButton = flipbook.querySelector(".next-page");
+            let documentPdf;
+            let currentPage = 1;
+            let isRendering = false;
+
+            async function renderSpread(startPage, direction = "next") {
+                isRendering = true;
+                previousButton.disabled = true;
+                nextButton.disabled = true;
+
+                try {
+                    const pageNumbers = (startPage === 1 ? [1] : [startPage, startPage + 1])
+                        .filter((pageNumber) => pageNumber <= documentPdf.numPages);
+                    spread.classList.remove("turn-next", "turn-previous");
+                    void spread.offsetWidth;
+                    spread.classList.add(direction === "next" ? "turn-next" : "turn-previous");
+                    spread.classList.toggle("is-single-page", pageNumbers.length === 1);
+                    spread.classList.toggle("is-cover", startPage === 1);
+                    const pageWidth = Math.min(290, Math.min(flipbook.clientWidth, 620) / 2);
+                    spread.style.width = `${pageWidth * pageNumbers.length}px`;
+                    pageFrames.forEach((frame, index) => {
+                        frame.hidden = index >= pageNumbers.length;
+                    });
+
+                    await Promise.all(pageNumbers.map(async (pageNumber, index) => {
+                        const frame = pageFrames[index];
+                        const canvas = canvases[index];
+                        frame.style.flex = `0 0 ${pageWidth}px`;
+                        frame.style.width = `${pageWidth}px`;
+
+                        const page = await documentPdf.getPage(pageNumber);
+                        const baseViewport = page.getViewport({ scale: 1 });
+                        const scale = Math.min(1.6, pageWidth / baseViewport.width);
+                        const viewport = page.getViewport({ scale });
+                        const context = canvas.getContext("2d");
+
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        await page.render({ canvasContext: context, viewport }).promise;
+                    }));
+
+                    const lastVisiblePage = Math.min(startPage + pageNumbers.length - 1, documentPdf.numPages);
+                    if (startPage === 1) {
+                        counter.textContent = `Forside | Side 1 av ${documentPdf.numPages}`;
+                    } else if (pageNumbers.length === 1) {
+                        counter.textContent = `Side ${startPage} av ${documentPdf.numPages}`;
+                    } else {
+                        counter.textContent = `Oppslag ${startPage}-${lastVisiblePage} av ${documentPdf.numPages}`;
+                    }
+                } finally {
+                    isRendering = false;
+                    previousButton.disabled = currentPage === 1;
+                    nextButton.disabled = (currentPage === 1 ? 2 : currentPage + 2) > documentPdf.numPages;
+                }
+            }
+
+            async function changePage(direction) {
+                const nextPage = direction > 0
+                    ? (currentPage === 1 ? 2 : currentPage + 2)
+                    : (currentPage === 2 ? 1 : currentPage - 2);
+                if (isRendering || nextPage < 1 || nextPage > documentPdf.numPages) {
+                    return;
+                }
+
+                currentPage = nextPage;
+                await renderSpread(currentPage, direction > 0 ? "next" : "previous");
+            }
+
+            previousButton.addEventListener("click", () => changePage(-1));
+            nextButton.addEventListener("click", () => changePage(1));
+            pageFrames[0].addEventListener("click", () => {
+                if (currentPage === 1 && !isRendering) {
+                    changePage(1);
+                }
+            });
+
+            try {
+                documentPdf = await pdfjsLib.getDocument(pdfPath).promise;
+                await renderSpread(currentPage);
+            } catch (error) {
+                counter.textContent = "Dokumentet kunne ikke lastes inn.";
+                previousButton.disabled = true;
+                nextButton.disabled = true;
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>

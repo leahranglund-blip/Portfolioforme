@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galleri - Min portefølje</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="gallery-body">
+    <header>
+        <p class="logo"><a href="index.html">Hovedside</a></p>
+        <nav aria-label="Hovedmeny">
+            <ul>
+                <li><a href="CV/Leah_Ranglund_CV26.pdf" target="_blank" rel="noopener noreferrer">CV</a></li>
+                <li><a href="Galleri.html">Galleri</a></li>
+                <li><a href="Om-meg.html">Om meg</a></li>
+                <li><a href="Sertifiseringer.html">Sertifiseringer</a></li>
+                <li><a href="Prosjekter.html">Prosjekter</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="gallery-page">
+            <div class="gallery-window" aria-label="Flytende bildegalleri">
+                <div class="gallery-grid" id="gallery-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <div class="image-lightbox" id="image-lightbox" role="dialog" aria-modal="true" aria-label="Forstørret bilde">
+        <img id="lightbox-image" src="" alt="">
+    </div>
+
+    <script>
+        const images = [
+            "DSCF2324.jpg",
+            "DSCF5097.jpg",
+            "DSCF6014.jpg",
+            "DSCF6059.jpg",
+            "DSCF6183.jpg",
+            "DSCF6222.jpg",
+            "DSCF6228.jpg",
+            "DSCF6270.jpg",
+            "DSCF6274.jpg",
+            "DSCF6284.jpg",
+            "DSCF6311.jpg",
+            "DSCF6333.jpg",
+            "DSCF6336.jpg",
+            "IMG_3046.jpg",
+            "IMG_7134_jpg.jpg",
+            "IMG_8279.jpg",
+            "IMG_8998.jpg",
+            "_DSC0276.jpg",
+            "_DSC0280.jpg",
+            "_DSC0323.jpg",
+            "_DSC0363.jpg",
+            "_DSC0364.jpg"
+        ];
+
+        const galleryGrid = document.querySelector("#gallery-grid");
+        const columns = 9;
+        const rows = 12;
+
+        for (let row = 0; row < rows; row += 1) {
+            for (let column = 0; column < columns; column += 1) {
+                const imageName = images[(row * columns + column) % images.length];
+                const image = document.createElement("img");
+                image.src = `Bilder/thumbnails/${imageName}`;
+                image.dataset.fullSrc = `Bilder/${imageName}`;
+                image.alt = `Bilde ${((row * columns + column) % images.length) + 1}`;
+                image.loading = "lazy";
+                image.decoding = "async";
+                image.fetchPriority = "low";
+                galleryGrid.appendChild(image);
+            }
+        }
+
+        const galleryWindow = document.querySelector(".gallery-window");
+        const lightbox = document.querySelector("#image-lightbox");
+        const lightboxImage = document.querySelector("#lightbox-image");
+        const middleRow = Math.floor(rows / 2);
+        const middleColumn = Math.floor(columns / 2);
+
+        function centerGallery() {
+            galleryWindow.scrollTop = galleryGrid.children[middleRow * columns].offsetTop;
+            galleryWindow.scrollLeft = galleryGrid.children[middleRow * columns + middleColumn].offsetLeft;
+        }
+
+        requestAnimationFrame(centerGallery);
+
+        galleryGrid.addEventListener("click", (event) => {
+            if (event.target.tagName !== "IMG") {
+                return;
+            }
+
+            lightboxImage.src = event.target.dataset.fullSrc;
+            lightboxImage.alt = event.target.alt;
+            lightbox.classList.add("is-open");
+        });
+
+        lightbox.addEventListener("click", () => {
+            lightbox.classList.remove("is-open");
+            lightboxImage.src = "";
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                lightbox.classList.remove("is-open");
+                lightboxImage.src = "";
+            }
+        });
+
+        galleryWindow.addEventListener("scroll", () => {
+            const nearTop = galleryWindow.scrollTop < galleryWindow.scrollHeight * 0.15;
+            const nearBottom = galleryWindow.scrollTop > galleryWindow.scrollHeight * 0.7;
+            const nearLeft = galleryWindow.scrollLeft < galleryWindow.scrollWidth * 0.15;
+            const nearRight = galleryWindow.scrollLeft > galleryWindow.scrollWidth * 0.7;
+
+            if (nearTop || nearBottom || nearLeft || nearRight) {
+                centerGallery();
+            }
+        });
+    </script>
+</body>
+</html>
