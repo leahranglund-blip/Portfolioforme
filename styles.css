@@ -1,6 +1,6 @@
 :root {
     --marineblaa: #6c0000;
-    --marineblaa-lys: #ddecff;
+    --marineblaa-lys: #c0dbfe;
     --hvit: #ffffff;
 }
 
@@ -13,8 +13,14 @@ body {
     min-height: 100vh;
     background: var(--marineblaa);
     color: var(--hvit);
-    font-family: Arial, sans-serif;
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
     transition: background-color 500ms ease, color 500ms ease;
+}
+p {
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.2px; /* gjør tynn font penere */
 }
 
 body.spotify-playing {
@@ -199,9 +205,64 @@ body.spotify-playing--reverse-psychology {
 }
 
 .home-next-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     min-height: 100vh;
-    padding: 0;
+    padding: 4rem 2rem;
     background: var(--marineblaa);
+}
+
+.home-video-content {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(2rem, 6vw, 5rem);
+    width: min(100%, 1100px);
+}
+
+.home-video-player {
+    min-width: 0;
+    width: min(100%, 380px);
+}
+
+.home-video-toggle {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+}
+
+.home-video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    object-fit: contain;
+}
+
+.home-video-overlay {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: rgb(0 0 0 / 75%);
+    font-weight: 400;
+}
+
+.home-video-toggle:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 4px;
+}
+
+.home-video-hint {
+    margin: 0.75rem 0 0;
+    font-size: 0.9rem;
 }
 
 header {
@@ -217,6 +278,27 @@ header {
 .logo {
     margin: 0;
     font-size: 1.4rem;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.linkedin-link {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+}
+
+.linkedin-link img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 0.25rem;
 }
 
 .logo a {
@@ -472,6 +554,15 @@ h2 {
 @media (max-width: 700px) {
     .home-header {
         gap: 1rem;
+    }
+
+    .home-video-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .home-video-content h2 {
+        font-size: clamp(1.7rem, 7vw, 2.5rem);
     }
 
     .home-mist {

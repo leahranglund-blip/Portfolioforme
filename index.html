@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Min portefølje</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="home-body">
     <header class="home-header">
-        <p class="logo">Leah Ranglund</p>
+        <div class="header-brand">
+            <p class="logo">Leah Ranglund</p>
+            <a class="linkedin-link" href="https://www.linkedin.com/in/leah-ranglund-330333166/" target="_blank" rel="noopener noreferrer" aria-label="Leah Ranglund på LinkedIn">
+                <img src="Bilder/linkedin%20icon.jpg" alt="">
+            </a>
+        </div>
 
         <nav aria-label="Hovedmeny">
             <ul>
@@ -37,12 +43,28 @@
             </svg>
             <img class="home-glass-image" src="Bilder/Texturelabs_Glass_154S.jpg" alt="" aria-hidden="true" draggable="false">
         </section>
-        <section class="home-next-section" aria-label="Neste del av porteføljen"></section>
+        <section class="home-next-section" aria-label="Videoproduksjon">
+            <div class="home-video-content">
+                <div class="home-video-player">
+                    <button class="home-video-toggle" type="button" aria-label="Spill av Try on tour-video med lyd" aria-pressed="false">
+                        <video class="home-video" playsinline preload="metadata" loop aria-hidden="true">
+                            <source src="Video/Try%20on%20tour.mp4" type="video/mp4">
+                        </video>
+                        <span class="home-video-overlay" aria-hidden="true">Spill av</span>
+                    </button>
+                    <p class="home-video-hint">Klikk på videoen eller trykk mellomrom for å spille av eller pause med lyd.</p>
+                </div>
+                <h2>Video produsert for Løplabbet Sandvika</h2>
+            </div>
+        </section>
     </main>
 
     <script>
         const hero = document.querySelector(".home-hero");
         const heroImage = document.querySelector(".home-hero-image");
+        const video = document.querySelector(".home-video");
+        const videoToggle = document.querySelector(".home-video-toggle");
+        const videoOverlay = document.querySelector(".home-video-overlay");
         const maskSvg = document.querySelector(".home-mask-definitions");
         const mask = document.querySelector("#glass-reveal-mask");
         const maskBackground = document.querySelector(".mask-background");
@@ -115,6 +137,43 @@
                 clearPoint.setAttribute("cy", "-1000");
                 clearPoint.setAttribute("opacity", "0");
             }, 900);
+        });
+
+        function updateVideoControl() {
+            const isPlaying = !video.paused;
+            videoToggle.setAttribute("aria-pressed", String(isPlaying));
+            videoToggle.setAttribute(
+                "aria-label",
+                `${isPlaying ? "Pause" : "Spill av"} Try on tour-video med lyd`
+            );
+            videoOverlay.textContent = isPlaying ? "Pause" : "Spill av";
+        }
+
+        videoToggle.addEventListener("click", () => {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
+        video.addEventListener("play", updateVideoControl);
+        video.addEventListener("pause", updateVideoControl);
+        document.addEventListener("keydown", (event) => {
+            if (event.code !== "Space" || event.repeat || event.altKey || event.ctrlKey || event.metaKey) {
+                return;
+            }
+
+            const target = event.target;
+            if (target instanceof HTMLElement && target.closest("a, button, input, select, textarea, [contenteditable='true']")) {
+                return;
+            }
+
+            event.preventDefault();
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
         });
     </script>
 </body>
