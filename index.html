@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Min portefølje</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20261008-1">
+    <link rel="stylesheet" href="styles.css?v=20261015-2">
+    <script src="fun-fact.js?v=20261013-1" defer></script>
 </head>
 <body class="home-body">
     <header class="home-header">
@@ -21,7 +22,7 @@
                 <li><a href="CV/Leah_Ranglund_CV26.pdf" target="_blank" rel="noopener noreferrer">CV</a></li>
                 <li><a href="Galleri.html">Galleri</a></li>
                 <li><a href="Om-meg.html">Om meg</a></li>
-                <li><a href="Sertifiseringer.html">Sertifiseringer</a></li>
+                <li><a href="Sertifiseringer.html">Sertifiseringer og kurs</a></li>
                 <li><a href="Prosjekter.html">Prosjekter</a></li>
             </ul>
         </nav>
@@ -29,152 +30,218 @@
 
     <main class="home-main">
         <section class="home-hero" aria-label="Highlands-landskap">
+            <img class="home-sailboat-image" src="Bilder/sailboat.jpg" alt="" aria-hidden="true" draggable="false">
             <img class="home-hero-image" src="Bilder/highlands.png" alt="Landskap fra Highlands" draggable="false">
-            <svg class="home-mask-definitions" aria-hidden="true">
-                <defs>
-                    <filter id="reveal-softness">
-                        <feGaussianBlur stdDeviation="4"></feGaussianBlur>
-                    </filter>
-                    <mask id="glass-reveal-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
-                        <rect class="mask-background" x="0" y="0" fill="white"></rect>
-                        <circle class="clear-point" cx="-1000" cy="-1000" r="50" fill="black" opacity="0" filter="url(#reveal-softness)"></circle>
-                    </mask>
-                </defs>
-            </svg>
-            <img class="home-glass-image" src="Bilder/Texturelabs_Glass_154S.jpg" alt="" aria-hidden="true" draggable="false">
+            <canvas class="home-highlands-overlay" aria-hidden="true"></canvas>
+            <canvas class="home-glass-overlay" aria-hidden="true"></canvas>
+            <img class="home-glass-texture" src="Bilder/Texturelabs_Glass_154S.jpg" alt="" aria-hidden="true" draggable="false">
         </section>
-        <section class="home-next-section" aria-label="Videoproduksjon">
-            <div class="home-video-content">
-                <div class="home-video-player">
-                    <button class="home-video-toggle" type="button" aria-label="Spill av Try on tour-video med lyd" aria-pressed="false">
-                        <video class="home-video" playsinline preload="metadata" loop aria-hidden="true">
-                            <source src="Video/Try%20on%20tour.mp4" type="video/mp4">
-                        </video>
-                        <span class="home-video-overlay" aria-hidden="true">Spill av</span>
-                    </button>
-                    <p class="home-video-hint">Klikk på videoen eller trykk mellomrom for å spille av eller pause med lyd.</p>
+        <section class="home-next-section" id="visittkort" aria-label="Visittkort">
+            <div class="home-business-card">
+                <div class="home-business-card-photo">
+                    <img src="Bilder/Profilbilde.jpg" alt="Portrett av Leah Ranglund">
                 </div>
-                <h2>Video produsert for Løplabbet Sandvika</h2>
+                <div class="home-business-card-contact">
+                    <h2>Leah Ranglund</h2>
+                    <p class="home-business-card-contact-label">Kontakt meg</p>
+                    <a href="mailto:leahranglund@icloud.com">E-post: leahranglund@icloud.com</a>
+                    <a href="tel:+4794798567">Tlf: +47 94798567</a>
+                </div>
             </div>
         </section>
     </main>
+    <aside class="fun-fact" aria-label="Fun fact om forsiden">
+        <button class="fun-fact-close" type="button" aria-label="Lukk fun fact">&times;</button>
+        <span class="fun-fact-label">Visste du at?</span>
+        <p>Vancouver bruker "sea to sky" for å reklamere for en rekke gondoler? Vi skulle flyttet Galdhøpiggen til Oslofjorden.</p>
+    </aside>
 
     <script>
         const hero = document.querySelector(".home-hero");
         const heroImage = document.querySelector(".home-hero-image");
-        const video = document.querySelector(".home-video");
-        const videoToggle = document.querySelector(".home-video-toggle");
-        const videoOverlay = document.querySelector(".home-video-overlay");
-        const maskSvg = document.querySelector(".home-mask-definitions");
-        const mask = document.querySelector("#glass-reveal-mask");
-        const maskBackground = document.querySelector(".mask-background");
-        const clearPoint = document.querySelector(".clear-point");
-        let targetX = -1000;
-        let targetY = -1000;
+        const highlandsCanvas = document.querySelector(".home-highlands-overlay");
+        const highlandsContext = highlandsCanvas.getContext("2d");
+        const glassImage = document.querySelector(".home-glass-texture");
+        const glassCanvas = document.querySelector(".home-glass-overlay");
+        const glassContext = glassCanvas.getContext("2d");
+        const trailLifetime = 1400;
+        const trailMarks = [];
         let pointerX = -1000;
         let pointerY = -1000;
-        let animationFrame;
+        let trailFrame;
         let hideTimer;
         let isRevealing = false;
+        let lastTrailPoint;
 
-        function resizeMask() {
+        function resizeRevealCanvas() {
             const bounds = hero.getBoundingClientRect();
-            maskSvg.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
-            mask.setAttribute("x", "0");
-            mask.setAttribute("y", "0");
-            mask.setAttribute("width", bounds.width);
-            mask.setAttribute("height", bounds.height);
-            maskBackground.setAttribute("x", "0");
-            maskBackground.setAttribute("y", "0");
-            maskBackground.setAttribute("width", bounds.width);
-            maskBackground.setAttribute("height", bounds.height);
+            const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+            highlandsCanvas.width = Math.round(bounds.width * pixelRatio);
+            highlandsCanvas.height = Math.round(bounds.height * pixelRatio);
+            highlandsContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+            glassCanvas.width = Math.round(bounds.width * pixelRatio);
+            glassCanvas.height = Math.round(bounds.height * pixelRatio);
+            glassContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+            drawHeroLayers(performance.now());
         }
 
-        function animateReveal() {
-            pointerX += (targetX - pointerX) * 0.14;
-            pointerY += (targetY - pointerY) * 0.14;
-            clearPoint.setAttribute("cx", pointerX);
-            clearPoint.setAttribute("cy", pointerY);
+        function eraseSmokeSpot(context, x, y, radius, opacity) {
+            const gradient = context.createRadialGradient(x, y, radius * 0.12, x, y, radius);
+            gradient.addColorStop(0, `rgba(0, 0, 0, ${opacity})`);
+            gradient.addColorStop(0.68, `rgba(0, 0, 0, ${opacity * 0.82})`);
+            gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+            context.fillStyle = gradient;
+            context.beginPath();
+            context.arc(x, y, radius, 0, Math.PI * 2);
+            context.fill();
+        }
 
-            if (Math.abs(targetX - pointerX) > 0.6 || Math.abs(targetY - pointerY) > 0.6) {
-                animationFrame = requestAnimationFrame(animateReveal);
+        function drawHeroLayers(now) {
+            drawHighlandsReveal(now);
+            drawRevealCanvas(now);
+        }
+
+        function drawHighlandsReveal(now) {
+            const bounds = hero.getBoundingClientRect();
+            highlandsContext.clearRect(0, 0, bounds.width, bounds.height);
+            if (heroImage.complete && heroImage.naturalWidth > 0) {
+                highlandsContext.globalCompositeOperation = "source-over";
+                highlandsContext.drawImage(heroImage, 0, 0, bounds.width, bounds.height);
+                highlandsContext.globalCompositeOperation = "destination-out";
+
+                for (const mark of trailMarks) {
+                    const progress = (now - mark.createdAt) / trailLifetime;
+                    if (progress < 1) {
+                        eraseSmokeSpot(highlandsContext, mark.x, mark.y, mark.radius, mark.opacity * (1 - progress));
+                    }
+                }
+
+                if (isRevealing) {
+                    eraseSmokeSpot(highlandsContext, pointerX, pointerY, 62, 0.98);
+                }
+            }
+            highlandsContext.globalCompositeOperation = "source-over";
+        }
+
+        function drawRevealCanvas(now) {
+            const bounds = hero.getBoundingClientRect();
+            glassContext.clearRect(0, 0, bounds.width, bounds.height);
+            if (glassImage.complete && glassImage.naturalWidth > 0) {
+                glassContext.globalCompositeOperation = "source-over";
+                glassContext.drawImage(glassImage, 0, 0, bounds.width, bounds.height);
+                glassContext.globalCompositeOperation = "destination-out";
+            }
+
+            for (let index = trailMarks.length - 1; index >= 0; index -= 1) {
+                const mark = trailMarks[index];
+                const progress = (now - mark.createdAt) / trailLifetime;
+                if (progress >= 1) {
+                    trailMarks.splice(index, 1);
+                } else {
+                    eraseSmokeSpot(glassContext, mark.x, mark.y, mark.radius, mark.opacity * (1 - progress));
+                }
+            }
+
+            if (isRevealing) {
+                eraseSmokeSpot(glassContext, pointerX, pointerY, 62, 0.98);
+            }
+            glassContext.globalCompositeOperation = "source-over";
+        }
+
+        function addSmokeMark(x, y, directionX, directionY, createdAt) {
+            const acrossX = -directionY;
+            const acrossY = directionX;
+            const shapes = [
+                { along: 0, across: 0, radius: 62, opacity: 0.96 },
+                { along: -15, across: 17, radius: 38, opacity: 0.72 },
+                { along: -29, across: -20, radius: 29, opacity: 0.62 }
+            ];
+
+            for (const shape of shapes) {
+                trailMarks.push({
+                    x: x + directionX * shape.along + acrossX * shape.across,
+                    y: y + directionY * shape.along + acrossY * shape.across,
+                    radius: shape.radius,
+                    createdAt,
+                    opacity: shape.opacity
+                });
+            }
+
+            if (trailMarks.length > 240) {
+                trailMarks.splice(0, trailMarks.length - 240);
+            }
+        }
+
+        function addSmokeTrail(x, y) {
+            const now = performance.now();
+            const nextPoint = { x, y };
+
+            if (!lastTrailPoint) {
+                addSmokeMark(x, y, 1, 0, now);
             } else {
-                pointerX = targetX;
-                pointerY = targetY;
+                const deltaX = x - lastTrailPoint.x;
+                const deltaY = y - lastTrailPoint.y;
+                const distance = Math.hypot(deltaX, deltaY);
+                const steps = Math.max(1, Math.ceil(distance / 18));
+                const directionX = distance ? deltaX / distance : 1;
+                const directionY = distance ? deltaY / distance : 0;
+
+                for (let step = 1; step <= steps; step += 1) {
+                    const progress = step / steps;
+                    addSmokeMark(
+                        lastTrailPoint.x + deltaX * progress,
+                        lastTrailPoint.y + deltaY * progress,
+                        directionX,
+                        directionY,
+                        now
+                    );
+                }
+            }
+
+            lastTrailPoint = nextPoint;
+            if (!trailFrame) {
+                trailFrame = requestAnimationFrame(animateSmokeTrail);
+            }
+        }
+
+        function animateSmokeTrail(now) {
+            drawHeroLayers(now);
+
+            if (trailMarks.length || isRevealing) {
+                trailFrame = requestAnimationFrame(animateSmokeTrail);
+            } else {
+                trailFrame = undefined;
+                lastTrailPoint = undefined;
             }
         }
 
         function startReveal(event) {
             const bounds = hero.getBoundingClientRect();
-            targetX = event.clientX - bounds.left;
-            targetY = event.clientY - bounds.top;
-            if (!isRevealing) {
-                pointerX = targetX;
-                pointerY = targetY;
-                isRevealing = true;
-            }
-
-            clearPoint.setAttribute("opacity", "1");
+            pointerX = event.clientX - bounds.left;
+            pointerY = event.clientY - bounds.top;
+            isRevealing = true;
             clearTimeout(hideTimer);
-            cancelAnimationFrame(animationFrame);
-            animationFrame = requestAnimationFrame(animateReveal);
+            addSmokeTrail(pointerX, pointerY);
         }
 
-        resizeMask();
-        window.addEventListener("resize", resizeMask);
-        new ResizeObserver(resizeMask).observe(hero);
-        heroImage.addEventListener("load", resizeMask);
+        resizeRevealCanvas();
+        window.addEventListener("resize", resizeRevealCanvas);
+        new ResizeObserver(resizeRevealCanvas).observe(hero);
+        heroImage.addEventListener("load", resizeRevealCanvas);
+        glassImage.addEventListener("load", resizeRevealCanvas);
         hero.addEventListener("pointermove", startReveal);
         hero.addEventListener("pointerleave", () => {
             hideTimer = setTimeout(() => {
-                cancelAnimationFrame(animationFrame);
                 isRevealing = false;
-                targetX = -1000;
-                targetY = -1000;
                 pointerX = -1000;
                 pointerY = -1000;
-                clearPoint.setAttribute("cx", "-1000");
-                clearPoint.setAttribute("cy", "-1000");
-                clearPoint.setAttribute("opacity", "0");
+                lastTrailPoint = undefined;
+                if (!trailFrame) {
+                    trailFrame = requestAnimationFrame(animateSmokeTrail);
+                }
             }, 900);
         });
 
-        function updateVideoControl() {
-            const isPlaying = !video.paused;
-            videoToggle.setAttribute("aria-pressed", String(isPlaying));
-            videoToggle.setAttribute(
-                "aria-label",
-                `${isPlaying ? "Pause" : "Spill av"} Try on tour-video med lyd`
-            );
-            videoOverlay.textContent = isPlaying ? "Pause" : "Spill av";
-        }
-
-        videoToggle.addEventListener("click", () => {
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
-            }
-        });
-        video.addEventListener("play", updateVideoControl);
-        video.addEventListener("pause", updateVideoControl);
-        document.addEventListener("keydown", (event) => {
-            if (event.code !== "Space" || event.repeat || event.altKey || event.ctrlKey || event.metaKey) {
-                return;
-            }
-
-            const target = event.target;
-            if (target instanceof HTMLElement && target.closest("a, button, input, select, textarea, [contenteditable='true']")) {
-                return;
-            }
-
-            event.preventDefault();
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
-            }
-        });
     </script>
 </body>
 </html>

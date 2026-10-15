@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Om meg - Min portefølje</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20261008-1">
+    <link rel="stylesheet" href="styles.css?v=20261014-16">
+    <script src="fun-fact.js?v=20261013-1" defer></script>
 </head>
 <body>
     <header>
@@ -20,11 +21,30 @@
                 <li><a href="CV/Leah_Ranglund_CV26.pdf" target="_blank" rel="noopener noreferrer">CV</a></li>
                 <li><a href="Galleri.html">Galleri</a></li>
                 <li><a href="Om-meg.html">Om meg</a></li>
-                <li><a href="Sertifiseringer.html">Sertifiseringer</a></li>
+                <li><a href="Sertifiseringer.html">Sertifiseringer og kurs</a></li>
                 <li><a href="Prosjekter.html">Prosjekter</a></li>
             </ul>
         </nav>
     </header>
+    <div class="stranger-things-orbs" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
     <main>
         <section class="about-section">
             <div class="about-copy">
@@ -38,6 +58,7 @@ Jeg vil videre inn i tech-siden av markedsføring, og denne portfolioen er mitt 
 Jeg bruker AI som et profesjonelt arbeidsverktøy. Jeg vurderer hva som faktisk er tidseffektivt å gjøre manuelt, og lar AI ta de repetitive og tidkrevende delene, slik at jeg kan bruke tiden på strategi, kreative valg og kvalitetssikring. Jeg leder prosessen og tar de endelige avgjørelsene selv.
 
 Du finner LinkedIn og CV-en min i menyen.</p>
+                <a class="about-contact-link" href="index.html#visittkort">Kontakt meg</a>
             </div>
             <div class="about-music">
                 <div class="record-player">
@@ -54,9 +75,14 @@ Du finner LinkedIn og CV-en min i menyen.</p>
             </div>
         </section>
     </main>
+    <aside class="fun-fact" aria-label="Fun fact om musikken">
+        <button class="fun-fact-close" type="button" aria-label="Lukk fun fact">&times;</button>
+        <span class="fun-fact-label">Visste du at?</span>
+        <p>Min svakeste side er sjokoladekake, men aldri uten glasur og helst den mormor lager. Husk å sjekke ut sangene ;)</p>
+    </aside>
 
     <script>
-        const tracks = [
+        const trackLibrary = [
             {
                 uri: "spotify:track:0AIpGG5dxEgnAymhdJRSZ0",
                 title: "Champagne Coast",
@@ -65,20 +91,29 @@ Du finner LinkedIn og CV-en min i menyen.</p>
                 theme: "spotify-playing"
             },
             {
+                uri: "spotify:track:0kwuKfWntoGh0EWyYb7Mpf",
+                title: "Stranger Things",
+                cover: "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e023fbdbf37626f8bee2abe8a39",
+                alt: "Stranger Things",
+                theme: "spotify-playing--stranger-things"
+            },
+            {
                 uri: "spotify:track:1b3UY0WcVkxQvPDGo7T36s",
                 title: "Angeline",
                 cover: "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02d124e1bb796385194f659200",
                 alt: "Wide Awake av Rayland Baxter",
-                theme: "spotify-playing--angeline"
+                theme: "spotify-playing--angeline",
+                enabled: false
             },
             {
-                uri: "spotify:track:0SN26lNl4kDUjil8Z7yLjq",
-                title: "Reverse Psychology",
-                cover: "https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e020353602204f376d1a16a2ea1",
-                alt: "Reverse Psychology av Temper City",
-                theme: "spotify-playing--reverse-psychology"
+                uri: "spotify:track:1phV9t2iyMfjXxGygcQ75k",
+                title: "Heya",
+                cover: "https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e029e3b1ec39a4853e7368aff1c",
+                alt: "Dance for the People av Greta Van Fleet",
+                theme: "spotify-playing--greta-van-fleet"
             }
         ];
+        const tracks = trackLibrary.filter((track) => track.enabled !== false);
 
         let currentTrackIndex = 0;
         let spotifyController;
@@ -89,12 +124,23 @@ Du finner LinkedIn og CV-en min i menyen.</p>
         const toggleButton = document.querySelector("#toggle-track");
         const nextButton = document.querySelector("#next-track");
         const themeClasses = tracks.map((track) => track.theme);
+        const strangerThingsStripsEnabled = false;
 
         function setTrackTheme(track) {
             document.body.classList.remove(...themeClasses);
             if (track) {
                 document.body.classList.add(track.theme);
             }
+            document.body.classList.toggle(
+                "stranger-things-lights",
+                isTrackPlaying && track?.theme === "spotify-playing--stranger-things"
+            );
+            document.body.classList.toggle(
+                "stranger-things-strips",
+                strangerThingsStripsEnabled
+                    && isTrackPlaying
+                    && track?.theme === "spotify-playing--stranger-things"
+            );
         }
 
         function changeTrack(direction) {
@@ -156,9 +202,9 @@ Du finner LinkedIn og CV-en min i menyen.</p>
                             return;
                         }
 
-                        isTrackPlaying = true;
                         const playingTrack = tracks.find((track) => track.uri === event.data.playingURI)
                             || tracks[currentTrackIndex];
+                        isTrackPlaying = true;
                         const playingTrackIndex = tracks.indexOf(playingTrack);
                         if (playingTrackIndex !== -1) {
                             currentTrackIndex = playingTrackIndex;

@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galleri - Min portefølje</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20261008-1">
+    <link rel="stylesheet" href="styles.css?v=20261013-22">
+    <script src="fun-fact.js?v=20261013-1" defer></script>
 </head>
 <body class="gallery-body">
     <header>
@@ -20,15 +21,17 @@
                 <li><a href="CV/Leah_Ranglund_CV26.pdf" target="_blank" rel="noopener noreferrer">CV</a></li>
                 <li><a href="Galleri.html">Galleri</a></li>
                 <li><a href="Om-meg.html">Om meg</a></li>
-                <li><a href="Sertifiseringer.html">Sertifiseringer</a></li>
+                <li><a href="Sertifiseringer.html">Sertifiseringer og kurs</a></li>
                 <li><a href="Prosjekter.html">Prosjekter</a></li>
             </ul>
         </nav>
     </header>
     <main>
         <section class="gallery-page">
-            <div class="gallery-window" aria-label="Flytende bildegalleri">
-                <div class="gallery-grid" id="gallery-grid"></div>
+            <div class="gallery-carousel">
+                <div class="carousel-stage" id="carousel-stage" tabindex="0" role="group" aria-label="3D-bildekarusell. Bruk venstre og høyre piltast eller dra for å bla.">
+                    <div class="carousel-ring" id="carousel-ring"></div>
+                </div>
             </div>
         </section>
     </main>
@@ -36,18 +39,21 @@
     <div class="image-lightbox" id="image-lightbox" role="dialog" aria-modal="true" aria-label="Forstørret bilde">
         <img id="lightbox-image" src="" alt="">
     </div>
+    <aside class="fun-fact" aria-label="Fun fact om galleriet">
+        <button class="fun-fact-close" type="button" aria-label="Lukk fun fact">&times;</button>
+        <span class="fun-fact-label">Visste du at?</span>
+        <p>Galleriet har 22 bilder som kan åpnes i stor visning.</p>
+    </aside>
 
     <script>
         const images = [
             "sailboat.jpg",
-            "puppydog.jpg",
             "waterfall.jpg",
-            "susbridge.jpg",
             "buschart.jpg",
             "dragonfly.jpg",
             "gressplen.jpg",
             "roses.jpg",
-            "boat.jpg",
+            "puppydog.jpg",
             "treejapan.jpg",
             "parrot.jpg",
             "oegle.jpg",
@@ -55,6 +61,8 @@
             "mouse.jpg",
             "horse.jpg",
             "jellyfish.jpg",
+            "susbridge.jpg",
+            "boat.jpg",
             "boats.jpg",
             "Baldeagle.jpg",
             "Owl.jpg",
@@ -63,46 +71,138 @@
             "squirellrbg.jpg"
         ];
 
-        const galleryGrid = document.querySelector("#gallery-grid");
-        const columns = 9;
-        const rows = 12;
-
-        for (let row = 0; row < rows; row += 1) {
-            for (let column = 0; column < columns; column += 1) {
-                const imageName = images[(row * columns + column) % images.length];
-                const image = document.createElement("img");
-                image.src = `Bilder/thumbnails/${imageName}`;
-                image.dataset.fullSrc = `Bilder/${imageName}`;
-                image.alt = `Bilde ${((row * columns + column) % images.length) + 1}`;
-                image.loading = "lazy";
-                image.decoding = "async";
-                image.fetchPriority = "low";
-                galleryGrid.appendChild(image);
-            }
-        }
-
-        const galleryWindow = document.querySelector(".gallery-window");
+        const carouselStage = document.querySelector("#carousel-stage");
+        const carouselRing = document.querySelector("#carousel-ring");
         const lightbox = document.querySelector("#image-lightbox");
         const lightboxImage = document.querySelector("#lightbox-image");
-        const middleRow = Math.floor(rows / 2);
-        const middleColumn = Math.floor(columns / 2);
+        const cards = [];
+        const stepAngle = 360 / images.length;
+        let selectedIndex = 0;
+        let currentStep = 0;
+        let rotation = 0;
+        let dragStartX;
+        let dragStartRotation;
+        let activePointerId;
+        let hasDragged = false;
+        let suppressClick = false;
 
-        function centerGallery() {
-            galleryWindow.scrollTop = galleryGrid.children[middleRow * columns].offsetTop;
-            galleryWindow.scrollLeft = galleryGrid.children[middleRow * columns + middleColumn].offsetLeft;
+        function imageTitle(imageName) {
+            return imageName
+                .replace(/\.[^.]+$/, "")
+                .replace(/([a-z])([A-Z])/g, "$1 $2")
+                .replace(/[_-]+/g, " ");
         }
 
-        requestAnimationFrame(centerGallery);
+        images.forEach((imageName, index) => {
+            const title = imageTitle(imageName);
+            const card = document.createElement("button");
+            card.className = "carousel-card";
+            card.type = "button";
+            card.setAttribute("aria-label", `Vis ${title} i full størrelse`);
+            card.style.setProperty("--card-angle", `${index * stepAngle}deg`);
 
-        galleryGrid.addEventListener("click", (event) => {
-            if (event.target.tagName !== "IMG") {
+            const image = document.createElement("img");
+            image.src = `Bilder/thumbnails/${imageName}`;
+            image.dataset.fullSrc = `Bilder/${imageName}`;
+            image.alt = title;
+            image.loading = index < 5 ? "eager" : "lazy";
+            image.decoding = "async";
+
+            card.append(image);
+            card.addEventListener("click", () => {
+                if (suppressClick) {
+                    suppressClick = false;
+                    return;
+                }
+                lightboxImage.src = image.dataset.fullSrc;
+                lightboxImage.alt = image.alt;
+                lightbox.classList.add("is-open");
+            });
+
+            carouselRing.appendChild(card);
+            cards.push(card);
+        });
+
+        function renderCarousel() {
+            carouselRing.style.setProperty("--ring-rotation", `${rotation}deg`);
+            cards.forEach((card, index) => {
+                const distance = Math.abs(index - selectedIndex);
+                const circularDistance = Math.min(distance, images.length - distance);
+                card.style.visibility = circularDistance <= 3 ? "visible" : "hidden";
+                card.setAttribute("aria-current", String(index === selectedIndex));
+                card.tabIndex = index === selectedIndex ? 0 : -1;
+            });
+        }
+
+        function updateSelectionFromRotation() {
+            currentStep = Math.round(-rotation / stepAngle);
+            selectedIndex = ((currentStep % images.length) + images.length) % images.length;
+            renderCarousel();
+        }
+
+        function selectStep(step) {
+            currentStep = step;
+            selectedIndex = ((currentStep % images.length) + images.length) % images.length;
+            rotation = -currentStep * stepAngle;
+            renderCarousel();
+        }
+
+        carouselStage.addEventListener("wheel", (event) => {
+            const distance = event.deltaX || (event.shiftKey ? event.deltaY : 0);
+            if (distance === 0) {
                 return;
             }
 
-            lightboxImage.src = event.target.dataset.fullSrc;
-            lightboxImage.alt = event.target.alt;
-            lightbox.classList.add("is-open");
+            event.preventDefault();
+            rotation -= distance * 0.35;
+            updateSelectionFromRotation();
+        }, { passive: false });
+
+        carouselStage.addEventListener("pointerdown", (event) => {
+            if (event.pointerType === "mouse" && event.button !== 0) {
+                return;
+            }
+            dragStartX = event.clientX;
+            dragStartRotation = rotation;
+            activePointerId = event.pointerId;
+            hasDragged = false;
         });
+
+        document.addEventListener("pointermove", (event) => {
+            if (dragStartX === undefined || event.pointerId !== activePointerId) {
+                return;
+            }
+            const distance = event.clientX - dragStartX;
+            if (Math.abs(distance) > 5) {
+                hasDragged = true;
+                carouselStage.classList.add("is-dragging");
+            }
+            if (hasDragged) {
+                event.preventDefault();
+            }
+            rotation = dragStartRotation + distance * 0.35;
+            carouselRing.style.setProperty("--ring-rotation", `${rotation}deg`);
+        });
+
+        function finishDrag(event) {
+            if (dragStartX === undefined || event.pointerId !== activePointerId) {
+                return;
+            }
+            dragStartX = undefined;
+            activePointerId = undefined;
+            carouselStage.classList.remove("is-dragging");
+            if (hasDragged) {
+                selectStep(Math.round(-rotation / stepAngle));
+                suppressClick = true;
+                window.setTimeout(() => {
+                    hasDragged = false;
+                    suppressClick = false;
+                }, 0);
+            }
+        }
+
+        document.addEventListener("pointerup", finishDrag);
+        document.addEventListener("pointercancel", finishDrag);
 
         lightbox.addEventListener("click", () => {
             lightbox.classList.remove("is-open");
@@ -110,22 +210,30 @@
         });
 
         document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") {
+            const activeElement = document.activeElement;
+            if (activeElement?.matches("a, input, textarea, select, [contenteditable='true']")) {
+                return;
+            }
+
+            if (!lightbox.classList.contains("is-open") && event.key === "ArrowLeft") {
+                event.preventDefault();
+                selectStep(currentStep - 1);
+                return;
+            }
+
+            if (!lightbox.classList.contains("is-open") && event.key === "ArrowRight") {
+                event.preventDefault();
+                selectStep(currentStep + 1);
+                return;
+            }
+
+            if (event.key === "Escape" && lightbox.classList.contains("is-open")) {
                 lightbox.classList.remove("is-open");
                 lightboxImage.src = "";
             }
         });
 
-        galleryWindow.addEventListener("scroll", () => {
-            const nearTop = galleryWindow.scrollTop < galleryWindow.scrollHeight * 0.15;
-            const nearBottom = galleryWindow.scrollTop > galleryWindow.scrollHeight * 0.7;
-            const nearLeft = galleryWindow.scrollLeft < galleryWindow.scrollWidth * 0.15;
-            const nearRight = galleryWindow.scrollLeft > galleryWindow.scrollWidth * 0.7;
-
-            if (nearTop || nearBottom || nearLeft || nearRight) {
-                centerGallery();
-            }
-        });
+        renderCarousel();
     </script>
 </body>
 </html>

@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sertifiseringer - Min portefølje</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20261008-1">
+    <link rel="stylesheet" href="styles.css?v=20261014-21">
+    <script src="fun-fact.js?v=20261013-1" defer></script>
 </head>
 <body>
     <header>
@@ -20,22 +21,43 @@
                 <li><a href="CV/Leah_Ranglund_CV26.pdf" target="_blank" rel="noopener noreferrer">CV</a></li>
                 <li><a href="Galleri.html">Galleri</a></li>
                 <li><a href="Om-meg.html">Om meg</a></li>
-                <li><a href="Sertifiseringer.html">Sertifiseringer</a></li>
+                <li><a href="Sertifiseringer.html">Sertifiseringer og kurs</a></li>
                 <li><a href="Prosjekter.html">Prosjekter</a></li>
             </ul>
         </nav>
     </header>
     <main>
         <section>
-            <h1>Sertifiseringer</h1>
+            <h1>Sertifiseringer og kurs</h1>
             <p>Leah Ranglund har fullført eller pågående følgende sertifiseringer og kurs:</p>
-            <ul>
-                <li>Google skillshop</li>
-                <li>Claude Academy</li>
-                <li>Hubspot Academy</li>
-                <li>Meta Blueprint</li>
-            </ul>
+            <div class="certification-list">
+                <article class="certification-card">
+                    <h2>Google Skillshop</h2>
+                </article>
+                <article class="certification-card">
+                    <h2>Claude Academy</h2>
+                </article>
+                <article class="certification-card">
+                    <h2>HubSpot Academy</h2>
+                </article>
+                <article class="certification-card">
+                    <h2>Meta Blueprint</h2>
+                </article>
+                <article class="certification-card">
+                    <h2>Technical Writing One</h2>
+                    <p class="certification-provider">Google for Developers</p>
+                </article>
+                <article class="certification-card">
+                    <h2>Technical Writing Two</h2>
+                    <p class="certification-provider">Google for Developers</p>
+                </article>
+            </div>
         </section>
     </main>
+    <aside class="fun-fact" aria-label="Fun fact om sertifiseringene">
+        <button class="fun-fact-close" type="button" aria-label="Lukk fun fact">&times;</button>
+        <span class="fun-fact-label">Visste du at?</span>
+        <p>Kurslisten spenner fra Google Skillshop til Claude Academy.</p>
+    </aside>
 </body>
 </html>

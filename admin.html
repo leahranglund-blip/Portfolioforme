@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Sertifiseringer og kurs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20261014-21">
+    <script src="fun-fact.js?v=20261013-1" defer></script>
+</head>
+<body>
+    <header>
+        <div class="header-brand">
+            <p class="logo"><a href="index.html">Hovedside</a></p>
+        </div>
+        <nav aria-label="Hovedmeny">
+            <ul>
+                <li><a href="Sertifiseringer.html">Sertifiseringer og kurs</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h1>Admin: Sertifiseringer og kurs</h1>
+            <p>Logg inn for å legge til, redigere, publisere eller fjerne elementer.</p>
+
+            <form id="login-form" class="admin-form">
+                <label for="admin-email">E-post</label>
+                <input id="admin-email" name="email" type="email" autocomplete="username" required>
+                <label for="admin-password">Passord</label>
+                <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+                <button type="submit">Logg inn</button>
+            </form>
+
+            <p id="admin-message" role="status" aria-live="polite"></p>
+
+            <div id="admin-panel" hidden>
+                <div class="admin-toolbar">
+                    <h2>Dine sertifiseringer og kurs</h2>
+                    <button id="sign-out" type="button">Logg ut</button>
+                </div>
+
+                <form id="certification-form" class="admin-form">
+                    <input id="certification-id" name="id" type="hidden">
+                    <label for="certification-title">Navn</label>
+                    <input id="certification-title" name="title" type="text" maxlength="160" required>
+                    <label for="certification-provider">Kursleverandør</label>
+                    <input id="certification-provider" name="provider" type="text" maxlength="160">
+                    <label for="certification-description">Beskrivelse</label>
+                    <textarea id="certification-description" name="description" rows="4" maxlength="2000"></textarea>
+                    <label for="certification-status">Status</label>
+                    <select id="certification-status" name="status">
+                        <option value="">Ikke angitt</option>
+                        <option value="Fullført">Fullført</option>
+                        <option value="Pågående">Pågående</option>
+                    </select>
+                    <label for="certification-date">Dato fullført</label>
+                    <input id="certification-date" name="completed_on" type="date">
+                    <label for="certification-url">Lenke til sertifikat</label>
+                    <input id="certification-url" name="credential_url" type="url" inputmode="url">
+                    <label for="certification-order">Rekkefølge</label>
+                    <input id="certification-order" name="sort_order" type="number" value="0" step="1">
+                    <label class="admin-checkbox">
+                        <input id="certification-published" name="is_published" type="checkbox" checked>
+                        Vis offentlig
+                    </label>
+                    <div class="admin-form-actions">
+                        <button type="submit">Lagre</button>
+                        <button id="cancel-edit" type="button" hidden>Avbryt redigering</button>
+                    </div>
+                </form>
+
+                <div id="admin-certification-list" class="admin-certification-list"></div>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="admin.js?v=20261014-1"></script>
+</body>
+</html>

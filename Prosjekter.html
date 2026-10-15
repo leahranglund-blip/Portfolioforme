@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prosjekter - Min portefølje</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20261008-1">
+    <link rel="stylesheet" href="styles.css?v=20261013-21">
+    <script src="fun-fact.js?v=20261013-1" defer></script>
 </head>
 <body>
     <header>
@@ -20,7 +21,7 @@
                 <li><a href="CV/Leah_Ranglund_CV26.pdf" target="_blank" rel="noopener noreferrer">CV</a></li>
                 <li><a href="Galleri.html">Galleri</a></li>
                 <li><a href="Om-meg.html">Om meg</a></li>
-                <li><a href="Sertifiseringer.html">Sertifiseringer</a></li>
+                <li><a href="Sertifiseringer.html">Sertifiseringer og kurs</a></li>
                 <li><a href="Prosjekter.html">Prosjekter</a></li>
             </ul>
         </nav>
@@ -29,6 +30,22 @@
         <section>
             <h1>Prosjekter</h1>
             <p>Denne siden viser noen av de prosjektene jeg har arbeidet med. Det er fremdeles arbeid under kontruksjon som vil komme opp her.</p>
+
+            <article class="project-item">
+                <div class="project-description">
+                    <h2>Ocean Outdoor Digital Creative Competition</h2>
+                    <p class="project-description-placeholder">Jeg deltok i studentkategorien til den nevnte konkurransen. Der gikk to av ideene til topps, da juryen falt for "Vold har ingen kamp dag" som vinnerbidrag. I tillegg var "Til jul i år fikk mamma..." på en tredjeplass. Begge bidragene var utviklet for Vold og Overgrepslinjen.</p>
+                </div>
+                <img class="project-image" src="Prosjekter/DCC.jpg" alt="DCC-prosjekt">
+            </article>
+
+            <article class="project-item">
+                <div class="project-description">
+                    <h2>VÅGA</h2>
+                    <p>Reklame publisert på Instagram-kontoen til Løplabbet Sandvika for VÅGA-capser.</p>
+                </div>
+                <img class="project-image" src="Prosjekter/Vaaga.jpg" alt="Vaaga-reklame for Løplabbet Sandvika">
+            </article>
 
             <article class="project-item">
                 <div class="project-description">
@@ -65,8 +82,20 @@
                     </div>
                 </div>
             </article>
+
+            <article class="project-item">
+                <div class="project-description">
+                    <h2>I would do that</h2>
+                </div>
+                <img class="project-image" src="Prosjekter/Iwoulddo.jpg" alt="Plakat med teksten «I would do anything for love but I won't do that»">
+            </article>
         </section>
     </main>
+    <aside class="fun-fact" aria-label="Fun fact om prosjektene">
+        <button class="fun-fact-close" type="button" aria-label="Lukk fun fact">&times;</button>
+        <span class="fun-fact-label">Visste du at?</span>
+        <p>Prosjektene viser ulike typer visuell kommunikasjon og designarbeid.</p>
+    </aside>
 
     <script type="module">
         import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
@@ -98,7 +127,9 @@
                     spread.classList.add(direction === "next" ? "turn-next" : "turn-previous");
                     spread.classList.toggle("is-single-page", pageNumbers.length === 1);
                     spread.classList.toggle("is-cover", startPage === 1);
-                    const pageWidth = Math.min(290, Math.min(flipbook.clientWidth, 620) / 2);
+                    const pageWidth = startPage === 1
+                        ? Math.min(flipbook.clientWidth, 620)
+                        : Math.min(290, Math.min(flipbook.clientWidth, 620) / 2);
                     spread.style.width = `${pageWidth * pageNumbers.length}px`;
                     pageFrames.forEach((frame, index) => {
                         frame.hidden = index >= pageNumbers.length;
