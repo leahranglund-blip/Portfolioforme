@@ -61,7 +61,8 @@
             "Owl.jpg",
             "stickeropera.jpg",
             "Squirrelbw.jpg",
-            "squirellrbg.jpg"
+            "squirellrbg.jpg",
+            "Prada.jpg"
         ];
 
         const carouselStage = document.querySelector("#carousel-stage");
@@ -97,6 +98,12 @@
             const image = document.createElement("img");
             image.src = `Bilder/thumbnails/${imageName}`;
             image.dataset.fullSrc = `Bilder/${imageName}`;
+            image.addEventListener("error", () => {
+                if (image.src.endsWith(image.dataset.fullSrc)) {
+                    return;
+                }
+                image.src = image.dataset.fullSrc;
+            }, { once: true });
             image.alt = title;
             image.loading = index < 5 ? "eager" : "lazy";
             image.decoding = "async";
